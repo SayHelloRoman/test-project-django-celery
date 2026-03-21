@@ -6,3 +6,4 @@ db.sqlite3
 .idea/
 .vscode/
 .pytest_cache/
+/api/migrations
