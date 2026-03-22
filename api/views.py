@@ -11,14 +11,6 @@ from .serializers import VerificationRequestSerializer
 from .tasks import check_request_status
 from django.conf import settings
 
-settings.REDIS_CLIENT = redis.StrictRedis(
-    host=settings.REDIS_HOST,
-    port=settings.REDIS_PORT,
-    db=0,
-    decode_responses=True
-)
-
-
 class VerificationRequestViewSet(viewsets.ModelViewSet):
     queryset = VerificationRequest.objects.all().order_by("-created_at")
     serializer_class = VerificationRequestSerializer
