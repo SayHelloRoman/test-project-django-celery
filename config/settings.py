@@ -18,6 +18,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 REDIS_CLIENT = redis.Redis(host='localhost', port=6379, db=0)
 
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/

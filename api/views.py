@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 
 from .models import VerificationRequest
 from .serializers import VerificationRequestSerializer
+from .tasks import check_request_status
 from django.conf import settings
 
 
@@ -40,8 +41,13 @@ class VerificationRequestViewSet(viewsets.ModelViewSet):
             )
 
         settings.REDIS_CLIENT.set(redis_key, "1", ex=600)
+        response = super().create(request, *args, **kwargs)
 
-        return super().create(request, *args, **kwargs)
+        request_id = response.data.get("id")
+
+        check_request_status.apply_async(args=[request_id], countdown=120)
+
+        return response
 
     @action(detail=True, methods=["patch"], url_path="status")
     def update_status(self, request, pk=None):
