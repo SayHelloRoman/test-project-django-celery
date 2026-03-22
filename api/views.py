@@ -1,13 +1,22 @@
-# views.py
-
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models import Count
+import redis
 
 from .models import VerificationRequest
 from .serializers import VerificationRequestSerializer
 from .tasks import check_request_status
 from django.conf import settings
+
+settings.REDIS_CLIENT = redis.StrictRedis(
+    host=settings.REDIS_HOST,
+    port=settings.REDIS_PORT,
+    db=0,
+    decode_responses=True
+)
 
 
 class VerificationRequestViewSet(viewsets.ModelViewSet):
@@ -61,3 +70,25 @@ class VerificationRequestViewSet(viewsets.ModelViewSet):
         instance.save()
 
         return Response({"status": instance.status})
+
+    @action(detail=False, methods=['get'], url_path='stats')
+    def stats(self, request):
+        from .models import VerificationRequest
+
+        total = VerificationRequest.objects.count()
+
+        by_status = (
+            VerificationRequest.objects
+            .values('status')
+            .annotate(count=Count('id'))
+        )
+
+        last_24h = VerificationRequest.objects.filter(
+            created_at__gte=timezone.now() - timedelta(hours=24)
+        ).count()
+
+        return Response({
+            "total": total,
+            "by_status": {item['status']: item['count'] for item in by_status},
+            "last_24h": last_24h
+        })

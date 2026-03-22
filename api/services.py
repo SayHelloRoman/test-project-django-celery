@@ -1,19 +1,9 @@
 import requests
-import logging
+from django.conf import settings
 
-logger = logging.getLogger(__name__)
-
-TELEGRAM_BOT_TOKEN = None
-CHAT_ID = None
-
-
-def send_telegram_message(text: str):
-    if TELEGRAM_BOT_TOKEN and CHAT_ID:
-        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-
-        requests.post(url, json={
-            "chat_id": CHAT_ID,
-            "text": text
-        })
+def send_telegram_message(message):
+    if settings.TG_BOT_TOKEN and settings.TG_CHAT_ID:
+        url = f"https://api.telegram.org/bot{settings.TG_BOT_TOKEN}/sendMessage"
+        requests.post(url, data={"chat_id": settings.TG_CHAT_ID, "text": message})
     else:
-        logger.info(f"[FAKE TELEGRAM] {text}")
+        print(f"[NOTIFICATION]: {message}")
