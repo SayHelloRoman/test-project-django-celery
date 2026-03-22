@@ -7,8 +7,8 @@
 1. **Склонуйте репозиторій:**
 
 ```bash
-git clone <repo_url>
-cd <repo_folder>
+git clone <https://github.com/SayHelloRoman/test-project-django-celery.git>
+cd <test-project-django-celery>
 
 docker-compose up --build
 docker-compose exec web python manage.py migrate
